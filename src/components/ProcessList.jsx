@@ -1,4 +1,5 @@
 import React from 'react';
+import ProcessListItem from './ProcessListItem';
 
 export default class ProcessList extends React.Component {
   constructor(props) {
@@ -6,20 +7,22 @@ export default class ProcessList extends React.Component {
   }
 
   render() {
-    let isEditing = this.props.isEditing;
-
     return <ol className="recipe-card_process-list">
-      {this.props.process.map( step =>
-        <li key={step.id}>
-          {isEditing && <span className="button-group">
-            <button className="ingredient_control">
-              -
-            </button>
-          </span>}
+      {this.props.process.length === 0 && <li>This recipe has no steps listed.</li>}
 
-          {step.text}
-        </li>
-      )}
+      {this.props.process.map( step =>
+        <ProcessListItem {...step}
+                         {...this.props.processActions}
+                         key={step.id}
+                         recipeId={this.props.recipeId}
+                         isParentEditing={this.props.isParentEditing} />)}
+
+      {this.props.isParentEditing &&
+        <button className="process-control_add-step"
+                onClick={() => this.props.addStep(this.props.recipeId)}>
+          Add Step
+        </button>
+      }
     </ol>
   }
 }

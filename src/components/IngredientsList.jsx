@@ -1,5 +1,6 @@
 import React from 'react';
-import Ingredient from './Ingredient';
+import IngredientsListItem from './IngredientsListItem';
+
 
 export default class IngredientsList extends React.Component {
   constructor(props) {
@@ -8,17 +9,15 @@ export default class IngredientsList extends React.Component {
 
   render() {
     return <ul className="recipe-card_ingredients-list">
+      {this.props.ingredients.length === 0 && <li>This recipe has no ingredients listed.</li>}
+
       {this.props.ingredients.map( ingredient => 
-        <Ingredient {...ingredient}
-                    key={ingredient.id}
-                    recipeId={this.props.recipeId}
-                    isParentEditing={this.props.isParentEditing}
-                    editIngredient={this.props.editIngredient} 
-                    cancelEditingIngredient={this.props.cancelEditingIngredient}
-                    doneEditingIngredient={this.props.doneEditingIngredient}
-                    deleteIngredient={this.props.deleteIngredient}
-                    cancelDeletingIngredient={this.props.cancelDeletingIngredient} />
-      )}
+          <IngredientsListItem {...ingredient}
+                               {...this.props.ingredientActions}
+                               key={ingredient.id}
+                               recipeId={this.props.recipeId}
+                               isParentEditing={this.props.isParentEditing} />)}
+
 
       {this.props.isParentEditing && 
         <button className="ingredient-control_add-ingredient"

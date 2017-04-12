@@ -1,7 +1,8 @@
+
 import React from 'react';
 import TextInput from './TextInput';
 
-export default class Ingredient extends React.Component {
+export default class IngredientsListItem extends React.Component {
   constructor(props) {
     super(props);
   }
@@ -11,7 +12,7 @@ export default class Ingredient extends React.Component {
   }
 
   render() {
-    return <li key={this.props.id}>
+    return <li className="recipe-card_ingredient"> 
       <div className="view">  
         {this.props.isParentEditing && !this.props.hasPendingDeletion &&
           <button className="ingredient_control"
@@ -40,10 +41,11 @@ export default class Ingredient extends React.Component {
       </div>
 
       {this.props.isEditing &&
-        <TextInput text={this.props.hasPendingUpdate ? this.props.pendingUpdate : this.props.text}
-                   cancelEditingIngredient={this.props.cancelEditingIngredient}
-                   doneEditingIngredient={this.props.doneEditingIngredient}
-                   ingredientId={this.props.id}
+        <TextInput fieldType={'text'}
+                   text={this.props.hasPendingUpdate ? this.props.pendingUpdate : this.props.text}
+                   cancelEditingSelf={this.props.cancelEditingIngredient}
+                   doneEditingSelf={this.props.doneEditingIngredient}
+                   selfId={this.props.id}
                    recipeId={this.props.recipeId} />
       }
     </li>

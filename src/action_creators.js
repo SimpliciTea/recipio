@@ -83,7 +83,58 @@ export function cancelEditingIngredient(recipeId, ingredientId) {
   }
 }
 
-// add ingredient
+/*
+ *  Process Actions
+ */
+
+export function editStep(recipeId, stepId) {
+  return {
+    type: 'EDIT_STEP',
+    recipeId,
+    stepId
+  }
+}
+
+export function deleteStep(recipeId, stepId) {
+  return {
+    type: 'SCHEDULE_DELETE_STEP',
+    recipeId,
+    stepId
+  }
+}
+
+export function doneEditingStep(recipeId, stepId, nextState) {
+  return {
+    type: 'DONE_EDITING_STEP',
+    recipeId,
+    stepId,
+    nextState
+  }
+}
+
+export function addStep(recipeId) {
+  return {
+    type: 'ADD_STEP',
+    recipeId
+  }
+}
+
+export function cancelDeletingStep(recipeId, stepId) {
+  return {
+    type: 'DESCHEDULE_DELETE_STEP',
+    recipeId,
+    stepId
+  }
+}
+
+export function cancelEditingStep(recipeId, stepId) {
+  return {
+    type: 'CANCEL_EDITING_STEP',
+    recipeId,
+    stepId
+  }
+}
+
 
 // delete recipe
 // create recipe

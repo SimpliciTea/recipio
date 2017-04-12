@@ -12,6 +12,38 @@ function setState(state, newState) {
   return state.merge(newState);
 }
 
+function cancelPendingCollectionUpdates(collection) {
+  // update collection
+  // - filter out items where (saved text) item.text === null
+  // - set item.isEditing to false
+  // - set item.hasPendingUpdate to false
+  // - set item.hasPendingDeletion to false
+  // - set item.pendingUpdate to null
+  return collection.filter( item => item.get('text') )
+    .map( item => item.merge({
+      isEditing: false,
+      hasPendingUpdate: false,
+      hasPendingDeletion: false,
+      pendingUpdate: null
+    }));
+}
+
+function commitPendingCollectionUpdates(collection) {
+  // update collection
+  // - filter out items where item.hasPendingDeletion === true
+  // - set all item.text to value stored in item.pendingUpdate
+  // - set all item.hasPendingUpdate to false
+  // - set all item.pendingUpdate to null
+  // - set all item.isEditing to false
+  return collection.filter( item => !item.get('hasPendingDeletion') ) 
+    .map( item => item.merge({
+      isEditing: false,
+      hasPendingUpdate: false,
+      text: item.get('pendingUpdate') || item.get('text'),
+      pendingUpdate: null
+    }));
+}
+
 
 /* RECIPE REDUCERS */
 function editRecipe(state, recipeId) {
@@ -25,68 +57,58 @@ function editRecipe(state, recipeId) {
 }
 
 function cancelEditingRecipe(state, recipeId) {
-  // get recipeIndex
+  // get recipeIndex, recipe
   const recipes = state.get('recipes');
   const recipeIndex = findItemIndex(recipes, recipeId);
+  const recipe = recipes.get(recipeIndex);
 
   // update ingredients
-  // - filter out ingredients with null ingredient.text
-  // - set all ingredient.isEditing to false
-  // - set all ingredient.hasPendingUpdate to false
-  // - set all ingredient.hasPendingDeletion to false
-  // - set all ingredient.pendingUpdate to null
-  const updatedIngredients = recipes.get(recipeIndex)
-    .get('ingredients')
-    .filter( ingredient => ingredient.get('text') )
-    .map( ingredient => ingredient.merge({
-      isEditing: false,
-      hasPendingUpdate: false,
-      hasPendingDeletion: false,
-      pendingUpdate: null
-    }));
+  const ingredients = recipe.get('ingredients');
+  const updatedIngredients = cancelPendingCollectionUpdates(ingredients);
+
+  // update process
+  const recipeProcess = recipe.get('process');
+  const updatedProcess = cancelPendingCollectionUpdates(recipeProcess);
 
   // update recipe
   // - set isEditing to false
   // - set hasPendingUpdate to false
   // - merge in updatedIngredients
+  // - merge in updatedProcess
   const updatedRecipe = recipes.get(recipeIndex)
     .merge({
       isEditing: false,
       hasPendingUpdate: false,
-      ingredients: updatedIngredients
+      ingredients: updatedIngredients,
+      process: updatedProcess
     });
 
   return state.update('recipes', recipes => recipes.set(recipeIndex, updatedRecipe)); 
 }
 
 function doneEditingRecipe(state, recipeId) {
-  // get recipeIndex
+  // get recipeIndex, recipe
   const recipes = state.get('recipes');
   const recipeIndex = findItemIndex(recipes, recipeId);
+  const recipe = recipes.get(recipeIndex);
 
   // update ingredients
-  // - filter out ingredients where ingredient.hasPendingDeletion === true
-  // - set all ingredient.text to value stored in ingredient.pendingUpdate
-  // - set all ingredient.hasPendingUpdate to false
-  // - set all ingredient.pendingUpdate to null
-  // - set all ingredient.isEditing to false
-  const updatedIngredients = recipes.get(recipeIndex)
-    .get('ingredients')
-    .filter( ingredient => !ingredient.get('hasPendingDeletion') ) 
-    .map( ingredient => ingredient.merge({
-      isEditing: false,
-      hasPendingUpdate: false,
-      text: ingredient.get('pendingUpdate') || ingredient.get('text'),
-      pendingUpdate: null
-    }));
+  const ingredients = recipe.get('ingredients');
+  const updatedIngredients = commitPendingCollectionUpdates(ingredients);
+
+  // update process
+  const recipeProcess = recipe.get('process');
+  const updatedProcess = commitPendingCollectionUpdates(recipeProcess);
 
   // update recipe
   // - set isEditing to false
   // - set hasPendingUpdate to false
   // - merge in updatedIngredients
+  // - merge in updatedProcess
   const updatedRecipe = recipes.get(recipeIndex)
     .merge({
       ingredients: updatedIngredients,
+      process: updatedProcess,
       isEditing: false,
       hasPendingUpdate: false
     });
@@ -247,6 +269,159 @@ function descheduleDeleteIngredient(state, recipeId, ingredientId) {
   return state.update('recipes', recipes => recipes.setIn([recipeIndex, 'ingredients', ingredientIndex], updatedIngredient));
 }
 
+
+/* PROCESS REDUCERS */
+function editStep(state, recipeId, stepId) {
+  // get recipeIndex
+  const recipes = state.get('recipes');
+  const recipeIndex = findItemIndex(recipes, recipeId);
+
+  // get stepIndex
+  const recipeProcess = recipes.get(recipeIndex)
+    .get('process');
+  const stepIndex = findItemIndex(recipeProcess, stepId);
+
+  // update step
+  // - set isEditing to true
+  const updatedStep = recipeProcess.get(stepIndex)
+    .set('isEditing', true);
+
+
+  // dispatch new state
+  return state.update('recipes', recipes => recipes.setIn([recipeIndex, 'process', stepIndex], updatedStep));
+}
+
+function cancelEditingStep(state, recipeId, stepId) {
+  // get recipeIndex
+  const recipes = state.get('recipes');
+  const recipeIndex = findItemIndex(recipes, recipeId);
+
+  // get stepIndex
+  const recipeProcess = recipes.get(recipeIndex)
+    .get('process');
+  const stepIndex = findItemIndex(recipeProcess, stepId);
+
+  // if step text has never been set
+  // e.g. new step created but canceled with no input,
+  // delete step
+  if (recipeProcess.get(stepIndex).get('text') === null) {
+    return deleteStep(state, recipeIndex, stepIndex);
+  }
+
+  // update step
+  // - set isEditing to false
+  const updatedStep = recipeProcess.get(stepIndex)
+    .set('isEditing', false);
+
+  // dispatch new state
+  return state.update('recipes', recipes => recipes.setIn([recipeIndex, 'process', stepIndex], updatedStep));
+}
+
+function doneEditingStep(state, recipeId, stepId, nextState) {
+  // get recipeIndex
+  const recipes = state.get('recipes');
+  const recipeIndex = findItemIndex(recipes, recipeId);
+
+  // get stepIndex
+  const recipeProcess = recipes.get(recipeIndex)
+    .get('process');
+  const stepIndex = findItemIndex(recipeProcess, stepId);
+
+  // if nextState is a blank string,
+  // delete step
+  if (nextState === '')
+    return deleteStep(state, recipeIndex, stepIndex);
+
+  // update recipe, step
+  // - set recipe.hasPendingUpdate to true
+  // - set step.hasPendingUpdate to true
+  // - set step.pendingUpdate to nextState
+  // - set step.isEditing to false
+  const updatedRecipe = recipes.get(recipeIndex)
+    .set('hasPendingUpdate', true)
+    .mergeIn(['process', stepIndex], {
+      isEditing: false,
+      hasPendingUpdate: true,
+      pendingUpdate: nextState
+    });
+
+
+  // dispatch new state
+  return state.update('recipes', recipes => recipes.set(recipeIndex, updatedRecipe));
+}
+
+function addStep(state, recipeId) {
+  // get recipeIndex
+  const recipes = state.get('recipes');
+  const recipeIndex = findItemIndex(recipes, recipeId);
+
+  // get nextStepId
+  const nextStepId = recipes.get(recipeIndex)
+    .get('process')
+    .reduce( (maxId, step) => Math.max(maxId, step.get('id')), 0) + 1;
+
+  // create newStep
+  const newStep = Map({
+    id: nextStepId,
+    text: null,
+    isEditing: true,
+    hasUpdatePending: false,
+    hasPendingDeletion: false,
+    pendingUpdate: null
+  })
+
+  // push newStep to recipe.recipeProcessList
+  const updatedSteps = recipes.get(recipeIndex)
+    .get('process')
+    .push(newStep);
+
+  // dispatch new state
+  return state.update('recipes', recipes => recipes.setIn([recipeIndex, 'process'], updatedSteps));
+}
+
+function deleteStep(state, recipeIndex, stepIndex) {
+  return state.update('recipes', recipes => recipes.deleteIn([recipeIndex, 'process', stepIndex]));
+}
+
+function scheduleDeleteStep(state, recipeId, stepId) {
+  // get recipeIndex
+  const recipes = state.get('recipes');
+  const recipeIndex = findItemIndex(recipes, recipeId);
+
+  // get stepIndex
+  const recipeProcess = recipes.get(recipeIndex)
+    .get('process');
+  const stepIndex = findItemIndex(recipeProcess, stepId);
+
+  // update step
+  // - set hasPendingDeletion to true
+  const updatedStep = recipeProcess.get(stepIndex)
+    .set('hasPendingDeletion', true);
+
+  // dispatch new state
+  return state.update('recipes', recipes => recipes.setIn([recipeIndex, 'process', stepIndex], updatedStep));
+}
+
+function descheduleDeleteStep(state, recipeId, stepId) {
+  // get recipeIndex
+  const recipes = state.get('recipes');
+  const recipeIndex = findItemIndex(recipes, recipeId);
+
+  // get stepIndex
+  const recipeProcess = recipes.get(recipeIndex)
+    .get('process');
+  const stepIndex = findItemIndex(recipeProcess, stepId);
+
+  // update step
+  // - set hasPendingDeletion to false
+  const updatedStep = recipeProcess.get(stepIndex)
+    .set('hasPendingDeletion', false);
+
+  // dispatch new state
+  return state.update('recipes', recipes => recipes.setIn([recipeIndex, 'process', stepIndex], updatedStep));
+}
+
+
 export default function (state = Map(), action) {
   switch (action.type) {
     case 'SET_STATE':
@@ -268,7 +443,19 @@ export default function (state = Map(), action) {
     case 'SCHEDULE_DELETE_INGREDIENT':
       return scheduleDeleteIngredient(state, action.recipeId, action.ingredientId);
     case 'DESCHEDULE_DELETE_INGREDIENT':
-      return descheduleDeleteIngredient(state, action.recipeId, action.ingredientId);
+      return descheduleDeleteStep(state, action.recipeId, action.ingredientId);
+    case 'EDIT_STEP':
+      return editStep(state, action.recipeId, action.stepId);
+    case 'CANCEL_EDITING_STEP':
+      return cancelEditingStep(state, action.recipeId, action.stepId);
+    case 'DONE_EDITING_STEP':
+      return doneEditingStep(state, action.recipeId, action.stepId, action.nextState);
+    case 'ADD_STEP':
+      return addStep(state, action.recipeId);
+    case 'SCHEDULE_DELETE_STEP':
+      return scheduleDeleteStep(state, action.recipeId, action.stepId);
+    case 'DESCHEDULE_DELETE_STEP':
+      return descheduleDeleteStep(state, action.recipeId, action.stepId);
   }
 
   return state;

@@ -38,8 +38,22 @@ store.dispatch({
           }
         ],
         process: [
-          {id: 1, text: 'Boil Macaroni'},
-          {id: 2, text: 'Stir In Cheese'}
+          {
+            id: 1, 
+            text: 'Boil Macaroni',
+            isEditing: false,
+            hasUpdatePending: false,
+            hasPendingDeletion: false,
+            pendingUpdate: null
+          },
+          {
+            id: 2, 
+            text: 'Stir in cheese',
+            isEditing: false,
+            hasUpdatePending: false,
+            hasPendingDeletion: false,
+            pendingUpdate: null
+          }
         ],
         isEditing: false,
         hasPendingUpdate: false
@@ -74,9 +88,30 @@ store.dispatch({
           }
         ],
         process: [
-          {id: 1, text: 'Boil Macaroni'},
-          {id: 2, text: 'Stir In Cheese'},
-          {id: 3, text: 'serve with Pico'}
+          {
+            id: 1, 
+            text: 'Boil Macaroni',
+            isEditing: false,
+            hasUpdatePending: false,
+            hasPendingDeletion: false,
+            pendingUpdate: null
+          },
+          {
+            id: 2, 
+            text: 'Stir In Cheese',
+            isEditing: false,
+            hasUpdatePending: false,
+            hasPendingDeletion: false,
+            pendingUpdate: null
+          },
+          {
+            id: 3, 
+            text: 'Serve with Pico',
+            isEditing: false,
+            hasUpdatePending: false,
+            hasPendingDeletion: false,
+            pendingUpdate: null
+          }
         ],
         isEditing: false,
         hasPendingUpdate: false

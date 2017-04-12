@@ -17,13 +17,13 @@ export default class TextInput extends React.Component {
   }
 
   cancelEditing() {
-    this.props.cancelEditingIngredient(this.props.recipeId, this.props.ingredientId);
+    this.props.cancelEditingSelf(this.props.recipeId, this.props.selfId);
   }
 
   doneEditing() {
     (this.props.text === this.state.value) ? 
       this.cancelEditing()
-    : this.props.doneEditingIngredient(this.props.recipeId, this.props.ingredientId, this.state.value);
+    : this.props.doneEditingSelf(this.props.recipeId, this.props.selfId, this.state.value);
   }
 
   _handleOnChange(e) {
@@ -44,12 +44,22 @@ export default class TextInput extends React.Component {
   }
 
   render() {
-    return <input type="text"
-           className="ingredient_input"
-           autoFocus={true}
-           value={this.state.value}
-           onChange={this._handleOnChange.bind(this)}
-           onBlur={this._handleOnBlur.bind(this)}
-           onKeyDown={this._handleKeyDown.bind(this)} />
+    console.log(this.props);
+    if (this.props.fieldType === 'text') {
+      return <input type="text"
+                    className="field_input"
+                    autoFocus={true}
+                    value={this.state.value}
+                    onChange={this._handleOnChange.bind(this)}
+                    onBlur={this._handleOnBlur.bind(this)}
+                    onKeyDown={this._handleKeyDown.bind(this)} />
+    } else if (this.props.fieldType === 'textarea') {
+      return <textarea className="field_input"
+                       autoFocus={true}
+                       onChange={this._handleOnChange.bind(this)}
+                       onBlur={this._handleOnBlur.bind(this)}
+                       value={this.state.value}
+                       onKeyDown={this._handleKeyDown.bind(this)} />
+    }
   }
 }
