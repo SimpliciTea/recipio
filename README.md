@@ -4,5 +4,6 @@ This is a small project to practice React/Redux, and demonstrate fundamental und
 
 it is a *work in progress*! :)
 
-install: ```npm install```
-run dev server: ```webpack-dev-server```
+**install**: ```npm install```
+
+**run dev server**: ```webpack-dev-server```
