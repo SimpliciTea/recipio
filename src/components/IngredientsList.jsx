@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {PropTypes} from 'react';
 import IngredientsListItem from './IngredientsListItem';
 
 
@@ -27,4 +27,12 @@ export default class IngredientsList extends React.Component {
       }
     </ul>
   }
+}
+
+IngredientsList.propTypes = {
+  ingredients: PropTypes.array.isRequired,
+  ingredientActions: PropTypes.object.isRequired,
+  addIngredient: PropTypes.func.isRequired,
+  recipeId: PropTypes.number.isRequired,
+  isParentEditing: PropTypes.bool.isRequired
 }

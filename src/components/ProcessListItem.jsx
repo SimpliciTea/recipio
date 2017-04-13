@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {PropTypes} from 'react';
 import TextInput from './TextInput';
 
 
@@ -50,4 +50,26 @@ export default class ProcessListItem extends React.Component {
       }
     </li>
   }
+}
+
+
+ProcessListItem.propTypes = {
+  recipeId: PropTypes.number.isRequired,
+  isParentEditing: PropTypes.bool.isRequired,
+  
+  // from {...step}
+  id: PropTypes.number.isRequired,
+  text: PropTypes.string,
+  isEditing: PropTypes.bool.isRequired,
+  hasUpdatePending: PropTypes.bool.isRequired,
+  hasPendingDeletion: PropTypes.bool.isRequired,
+  pendingUpdate: PropTypes.string,
+  
+  // from {...processActions}
+  editStep: PropTypes.func.isRequired,
+  cancelEditingStep: PropTypes.func.isRequired,
+  doneEditingStep: PropTypes.func.isRequired,
+  addStep: PropTypes.func.isRequired,
+  deleteStep: PropTypes.func.isRequired,
+  cancelDeletingStep: PropTypes.func.isRequired
 }

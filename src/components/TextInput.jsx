@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {PropTypes} from 'react';
 
 
 export default class TextInput extends React.Component {
@@ -44,7 +44,6 @@ export default class TextInput extends React.Component {
   }
 
   render() {
-    console.log(this.props);
     if (this.props.fieldType === 'text') {
       return <input type="text"
                     className="field_input"
@@ -62,4 +61,14 @@ export default class TextInput extends React.Component {
                        onKeyDown={this._handleKeyDown.bind(this)} />
     }
   }
+}
+
+
+TextInput.propTypes = {
+  fieldType: PropTypes.string.isRequired,
+  text: PropTypes.string,
+  selfId: PropTypes.number.isRequired,
+  recipeId: PropTypes.number.isRequired,
+  cancelEditingSelf: PropTypes.func.isRequired,
+  doneEditingSelf: PropTypes.func.isRequired
 }

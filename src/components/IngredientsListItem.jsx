@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React, {PropTypes} from 'react';
 import TextInput from './TextInput';
 
 export default class IngredientsListItem extends React.Component {
@@ -52,6 +51,27 @@ export default class IngredientsListItem extends React.Component {
   }
 }
 
+IngredientsListItem.propTypes = {
+  recipeId: PropTypes.number.isRequired,
+  isParentEditing: PropTypes.bool.isRequired,
+  
+  // from {...ingredient}
+  id: PropTypes.number.isRequired,
+  text: PropTypes.string,
+  isEditing: PropTypes.bool.isRequired,
+  hasUpdatePending: PropTypes.bool.isRequired,
+  hasPendingDeletion: PropTypes.bool.isRequired,
+  pendingUpdate: PropTypes.string,
+  
+  // from {...ingredientActions}
+  editIngredient: PropTypes.func.isRequired,
+  cancelEditingIngredient: PropTypes.func.isRequired,
+  doneEditingIngredient: PropTypes.func.isRequired,
+  addIngredient: PropTypes.func.isRequired,
+  deleteIngredient: PropTypes.func.isRequired,
+  cancelDeletingIngredient: PropTypes.func.isRequired
+}
+
 // edit item
 // cancel editing
 // finish editing
@@ -66,3 +86,4 @@ export default class IngredientsListItem extends React.Component {
 
 // ACTIONS:
 // setPendingUpdate
+

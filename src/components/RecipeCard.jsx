@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { PropTypes } from 'react';
 import IngredientsList from './IngredientsList';
 import ProcessList from './ProcessList';
 import ProcessListItem from './ProcessListItem';
@@ -43,4 +43,18 @@ export default class RecipeCard extends React.Component {
       )}
     </li>
   }
+}
+
+RecipeCard.propTypes = {
+  // from {...recipe}
+  id: PropTypes.number.isRequired,
+  ingredients: PropTypes.array.isRequired,
+  process: PropTypes.array.isRequired,
+  isEditing: PropTypes.bool.isRequired,
+  
+  // from {...actionMap.recipeCardActions}
+  ingredientActions: PropTypes.object.isRequired,
+  editRecipe: PropTypes.func.isRequired,
+  cancelEditingRecipe: PropTypes.func.isRequired,
+  doneEditingRecipe: PropTypes.func.isRequired
 }

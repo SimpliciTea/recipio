@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {PropTypes} from 'react';
 import ProcessListItem from './ProcessListItem';
 
 export default class ProcessList extends React.Component {
@@ -25,4 +25,12 @@ export default class ProcessList extends React.Component {
       }
     </ol>
   }
+}
+
+ProcessList.propTypes = {
+  process: PropTypes.array.isRequired,
+  processActions: PropTypes.object.isRequired,
+  addStep: PropTypes.func.isRequired,
+  recipeId: PropTypes.number.isRequired,
+  isParentEditing: PropTypes.bool.isRequired
 }
