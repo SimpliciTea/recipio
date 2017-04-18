@@ -14,7 +14,7 @@ export default class TextInput extends React.Component {
   // setting value at componentDidMount puts cursor at end of string
   // when autofocused
   componentDidMount() {
-    this.setState({value: this.props.text});
+    this.setState({value: this.props.text || ''});
   }
 
   cancelEditing() {
