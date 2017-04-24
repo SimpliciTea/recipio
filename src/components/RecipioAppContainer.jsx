@@ -9,18 +9,12 @@ export class RecipioApp extends React.Component {
     super(props);
   }
 
-  getRecipes() {
-    if (this.props.recipes) {
-      return this.props.recipes;
-    }
-
-    return [];
-  }
-
   componentWillMount() {
     this.actionMap = this.mapActionsToComponents();
   }
 
+  // bundle actions to clean up passing props to nested components.
+  // Not sure about connecting deeper children to Redux yet.
   mapActionsToComponents() {
     return {
       recipeCardActions: {
@@ -50,7 +44,7 @@ export class RecipioApp extends React.Component {
 
   render() {
     return <ul className="recipe-list">
-      {this.getRecipes().map( recipe => 
+      {this.props.recipes.map( recipe => 
         <RecipeCard {...recipe.toJS()}
                     {...this.actionMap.recipeCardActions}
                     key={recipe.get('id')} />
