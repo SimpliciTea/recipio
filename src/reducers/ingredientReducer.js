@@ -20,7 +20,7 @@ export default function (state = List(), action) {
     case 'SCHEDULE_DELETE_INGREDIENT':
       return scheduleDeleteIngredient(state, action.recipeId, action.ingredientId);
     case 'DESCHEDULE_DELETE_INGREDIENT':
-      return descheduleDeleteStep(state, action.recipeId, action.ingredientId);
+      return descheduleDeleteIngredient(state, action.recipeId, action.ingredientId);
     default:
       return state;
   }
